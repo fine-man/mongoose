@@ -97,18 +97,29 @@ void LSH::retrieve(std::unordered_set<int>& result, const int table_idx, const i
 	if(table.find(bucket_idx) != table.end())
 	{
 		const std::vector<int>& bucket = table[bucket_idx];
+		// inserts all the numbers from the bucket vector to the result set
 		result.insert(bucket.begin(), bucket.end());
 	}
 }
 
 std::unordered_set<int> LSH::query_multi(const int* fp, const int N)
 {
+	/*
+	Input:
+		- fp: pointer to the hashed array of size (N, D + 1)
+		- N: Number of data points
+	
+	Output:
+		- result:
+	*/
 	int offset = -1;
 	std::unordered_set<int> result;
 	for(int idx = 0; idx < N; ++idx)
 	{
+		// for each data point
 		for(int jdx = 0; jdx < L; ++jdx)
 		{
+			// for each hash table
 			retrieve(result, jdx, fp[++offset]);
 		}
 	}

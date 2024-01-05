@@ -27,8 +27,8 @@ class LSHSampledLayer(nn.Module):
 
         self.store_query = True
         # last layer
-        self.params = nn.Linear(layer_size, num_class)
-        self.params.bias = nn.Parameter(torch.Tensor(num_class, 1))
+        self.params = nn.Linear(layer_size, num_class) # weight.shape = (C, D)
+        self.params.bias = nn.Parameter(torch.Tensor(num_class, 1)) # (C, 1)
         self.init_weights(self.params.weight, self.params.bias)
 
         # construct lsh using triplet weight
@@ -82,7 +82,11 @@ class LSHSampledLayer(nn.Module):
 
         N, D = x.size()
         # sid, hashcode = self.lsh.query_multi(x.data, N)
+
+        # query_lolash.shape = (N, D + 1)
         query_tolsh = torch.cat( (x, torch.ones(N).unsqueeze(dim = 1).to(device)), dim = 1 )
+        # sid is a set containing all the neuron IDs
+        # hashcode is of shape (N, L) containing the hash-buckets for each datapoint
         sid, hashcode = self.lsh.query_multi(query_tolsh.data, N)
 
         sampled_ip = 0

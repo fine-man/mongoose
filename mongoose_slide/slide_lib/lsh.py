@@ -7,9 +7,12 @@ import numpy as np
 import numpy.random
 import scipy as sp
 import scipy.stats
+import sys
 
 import torch
 import os
+
+sys.path.append('/home/vanshg/play/IIITH/research-cvit/mongoose/lsh_lib')
 
 from clsh import pyLSH
 # os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
@@ -69,6 +72,8 @@ class LSH:
 
     def query_multi(self, items, N):
         #fp = np.ascontiguousarray(self.func.hash(items, transpose=True).int().cpu())
+
+        # fp.shape = (N, L)
         fp = np.ascontiguousarray(self.func.hash(items, transpose=False).int().cpu())
         return self.lsh_.query_multi(fp, N), fp
 

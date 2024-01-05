@@ -1,13 +1,12 @@
 
 import torch
-from mongoose_slide.slide_lib.cupy_kernel import cupyKernel
+from cupy_kernel import cupyKernel
 import numpy as np
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
+# Kernel Code
 kernel = '''
-
-
 extern "C"
 __global__ void fingerprint(const float* src, const int k, const int L, long* fp)
 {
@@ -31,6 +30,8 @@ __global__ void fingerprint(const float* src, const int k, const int L, long* fp
 }
 '''
 
+# rp = random projection
+# srp = sparse random projection
 class SimHash:
     def __init__(self, d_, k_, L_, weights=None,seed_=8191):
         self.d = d_
@@ -39,6 +40,7 @@ class SimHash:
         self.fp = cupyKernel(kernel, "fingerprint")
 
 
+        # self.rp is tensor of size (d, K * L)
         if weights is None:
             self.rp = SimHash.generate(d_, k_, L_, seed_)
         else:
@@ -63,9 +65,9 @@ class SimHash:
     def generate(d, k, L, seed):
         print("random generate hash table weight")
         rand_gen = np.random.RandomState(seed)
-        matrix = rand_gen.randn(d, k*L)
-        positive = np.greater_equal(matrix, 0.0)
-        negative = np.less(matrix, 0.0)
+        matrix = rand_gen.randn(d, k*L) # (d, K * L)
+        positive = np.greater_equal(matrix, 0.0) # (d, K * L)
+        negative = np.less(matrix, 0.0) # (d, K * L)
         result = positive.astype(np.float32) - negative.astype(np.float32)
         return torch.from_numpy(result).to(device)
 
@@ -75,8 +77,17 @@ class SimHash:
 
 
     def hash(self, data, transpose=False):
+        """
+        Input:
+            data: Torch tensor of size (N, D)
+        
+        Output:
+            result: Torch tensor of size (N, L) 
+                containing the L hash tables for the N data-point
+        """
         N, D = data.size()
-        srp = torch.matmul(data.to(device), self.rp)
+        # (N, K * L) = (N, D) @ (D, K * L)
+        srp = torch.matmul(data.to(device), self.rp) # (N, K * L)
         #print("srp", srp)
         result = self.fingerprint(srp, N)
         #print("result", result)
