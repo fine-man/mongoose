@@ -12,9 +12,12 @@ import sys
 import torch
 import os
 
-sys.path.append('/home/vanshg/play/IIITH/research-cvit/mongoose/lsh_lib')
+CUR_DIR = os.getcwd()
+HOME_DIR = os.path.dirname(os.path.dirname(CUR_DIR))
+sys.path.append(HOME_DIR)
+# sys.path.append('/home/vanshg/play/IIITH/research-cvit/mongoose/lsh_lib')
 
-from clsh import pyLSH
+from lsh_lib.clsh import pyLSH
 # os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
 # os.environ["CUDA_VISIBLE_DEVICES"]=config.gpu
 

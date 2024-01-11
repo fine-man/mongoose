@@ -2,8 +2,8 @@ import os
 import sys
 
 CUR_DIR = os.getcwd()
-sys.path.append(os.path.join(CUR_DIR, "lsh_lib"))
-sys.path.append(os.path.join(CUR_DIR, "mongoose_slide"))
+Project_DIR = os.path.dirname(CUR_DIR)
+sys.path.append(Project_DIR)
 
 from mongoose_slide.slide_lib.lsh import LSH
 from mongoose_slide.slide_lib.simHash import SimHash
