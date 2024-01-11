@@ -31,7 +31,7 @@ class LSH:
         self.sample_size = 0
         self.count = 0
 
-    def setSimHash(self, func_):
+    def setHash(self, func_):
         self.func = func_
 
     def resetLSH(self, func_):
@@ -76,6 +76,14 @@ class LSH:
         # fp.shape = (N, L)
         fp = np.ascontiguousarray(self.func.hash(items, transpose=False).int().cpu())
         return self.lsh_.query_multi(fp, N), fp
+    
+    # incomplete code with query_multiset
+    # def query_multiset(self, items, N):
+    #     #fp = np.ascontiguousarray(self.func.hash(items, transpose=True).int().cpu())
+
+    #     # fp.shape = (N, L)
+    #     fp = np.ascontiguousarray(self.func.hash(items, transpose=False).int().cpu())
+    #     return self.lsh_.query_multiset(fp, N), fp
 
     def query_multi_mask(self, item, M, N):
         fp = self.func.hash(item).int().cpu().numpy()
@@ -85,7 +93,7 @@ class LSH:
         self.lsh_.query_multi_mask(fp, mask.numpy(), M, N)
         # self.lsh_.query_multi_mask_L(fp, mask.numpy(), mask_L.numpy(), M, N)
         return  mask.to(device), fp
-
+    
     def accidental_match(self, labels, samples, N):
         self.lsh_.accidental_match(labels, samples, N)
 

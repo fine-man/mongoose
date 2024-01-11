@@ -52,6 +52,10 @@ cdef class pyLSH:
     def query_multi_mask(self, np.ndarray[int, ndim=2, mode="c"] fp, np.ndarray[float, ndim=2, mode="c"] mask, int M, int N):
         return self.c_lsh.query_multi_mask(&fp[0, 0], &mask[0,0], M, N)
 
+    @cython.boundscheck(False)
+    def query_multiset(self, np.ndarray[int, ndim=2, mode="c"] fp, int N):
+        return self.c_lsh.query_multi(&fp[0, 0], N)
+
 #    @cython.boundscheck(False)
 #    def query_multi_mask_L(self, np.ndarray[int, ndim=2, mode="c"] fp, np.ndarray[float, ndim=2, mode="c"] mask, np.ndarray[float, ndim=3, mode="c"] mask_L, int M, int N):
 #        return self.c_lsh.query_multi_mask_L(&fp[0, 0], &mask[0,0], &mask_L[0,0,0], M, N)

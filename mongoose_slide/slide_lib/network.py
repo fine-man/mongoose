@@ -42,16 +42,25 @@ class LSHSampledLayer(nn.Module):
         self.thresh = 0.3
         self.hashcodes = self.thresh_hash.hash(torch.cat((self.params.weight, self.params.bias), dim = 1))
 
-        for name in self.backward_timer_names:
-            self.backward_timer[name] = []
-        for name in self.forward_timer_names:
-            self.forward_timer[name] = []
+        # for name in self.backward_timer_names:
+        #     self.backward_timer[name] = []
+        # for name in self.forward_timer_names:
+        #     self.forward_timer[name] = []
 
 
     def initializeLSH(self):
-        self.lsh = LSH( SimHash(self.D+1, self.K, self.L, self.hash_weight), self.K, self.L )
+        threads = 1
+        self.lsh = LSH( SimHash(self.D+1, self.K, self.L, self.hash_weight), self.K, self.L,
+                       threads_=threads)
+        # weight_tolsh.shape = (layer_size, D + 1)
         weight_tolsh = torch.cat( (self.params.weight, self.params.bias), dim = 1)
         self.lsh.insert_multi(weight_tolsh.to(device).data, self.num_class )
+
+    def init_weights(self, weight, bias):
+        initrange = 0.05
+        weight.data.uniform_(-initrange, initrange)
+        bias.data.fill_(0)
+        # bias.require_gradient = False
     
     def setSimHash(self, seed, hashweight = None):
         print("update simhash")
@@ -70,12 +79,6 @@ class LSHSampledLayer(nn.Module):
             self.hashcodes = check
         else:
             print("No need")
-
-    def init_weights(self, weight, bias):
-        initrange = 0.05
-        weight.data.uniform_(-initrange, initrange)
-        bias.data.fill_(0)
-        # bias.require_gradient = False
 
     def train_forward(self, x, y, triplet_flag, debug=False):
         '''weight normalization'''
@@ -119,7 +122,7 @@ class LSHSampledLayer(nn.Module):
 
 class Net(nn.Module):
     def __init__(self, input_size, output_size, layer_size, hash_weight, K, L):
-        super(Net, self).__init__()
+        super().__init__()
         stdv = 1. / math.sqrt(input_size)
         self.input_size = input_size
         self.output_size = output_size

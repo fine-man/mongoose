@@ -1,6 +1,10 @@
 
 import torch
-from cupy_kernel import cupyKernel
+import sys
+sys.path.append('/home/vanshg/play/iiith/research-cvit/mongoose/mongoose_slide')
+from mongoose_slide.slide_lib.cupy_kernel import cupyKernel
+
+# from cupy_kernel import cupyKernel
 import numpy as np
 
 use_cuda = torch.cuda.is_available()
@@ -17,6 +21,7 @@ __global__ void fingerprint(const float* src, const int k, const int L, long* fp
 	long value = (threadIdx.x >= k || src[offset] <= 0) ? 0 : 1;
         value <<= threadIdx.x;
 
+        // warpSize = 32 for NVIDIA GPUs
         for (int offset = warpSize/2; offset > 0; offset /= 2)
         {
                 value |= __shfl_down_sync(0xFFFFFFFF, value, offset, 32);
@@ -86,6 +91,7 @@ class SimHash:
                 containing the L hash tables for the N data-point
         """
         N, D = data.size()
+        # print(self.rp.shape)
         # (N, K * L) = (N, D) @ (D, K * L)
         srp = torch.matmul(data.to(device), self.rp) # (N, K * L)
         #print("srp", srp)

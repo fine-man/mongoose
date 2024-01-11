@@ -1,4 +1,6 @@
 .idea/
+**/__pycache__/
+*.so
 mongoose_reformer/train_reformer_lm.py
 mongoose_slide/train_slide.py
 mongoose_slide/train_slide_baseline.py
