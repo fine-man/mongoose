@@ -3,6 +3,7 @@
 *.o
 *.so
 data/
+checkpoints/
 lsh_lib/
 mongoose_reformer/train_reformer_lm.py
 mongoose_slide/train_slide.py

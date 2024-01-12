@@ -26,7 +26,8 @@ class SimpleMLP(nn.Module):
 
     def forward(self, X):
         if self.flatten_first:
-            X = X.view(-1, 28 * 28)
+            N = X.shape[0]
+            X = X.view(N, -1)
             N, D = X.shape[:2]
 
         if self.training:

@@ -36,7 +36,8 @@ class TwoLayerLSH(nn.Module):
 
     def forward(self, X):
         if self.flatten:
-            X = X.view(-1, 28 * 28)
+            N = X.shape[0]
+            X = X.view(N, -1)
             N, D = X.shape[:2]
 
         # sample_logits.shape = (N, num_neurons)
